@@ -4,13 +4,90 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Submit Debate Topic</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    header {
+      background: #1f1f1f;
+      padding: 1rem 2rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #00bcd4;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.7);
+      width: 100%;
+      position: fixed;
+      top: 0;
+    }
+    .container {
+      background: #222;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0,188,212,0.3);
+      max-width: 500px;
+      width: 90%;
+    }
+    h1 {
+      color: #00bcd4;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+      color: #cfd8dc;
+    }
+    input[type="text"] {
+      padding: 0.8rem;
+      margin-bottom: 1.5rem;
+      border: none;
+      border-radius: 4px;
+      background: #333;
+      color: #fff;
+      font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 0.8rem 1.5rem;
+      background: #00bcd4;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #0097a7;
+    }
+  </style>
 </head>
 <body>
-  <h1>Submit a Debate Topic</h1>
-  <form action="/debate/" method="get">
-    <label for="debate_topic">Debate Topic:</label><br />
-    <input type="text" id="debate_topic" name="debate_topic" required style="width: 300px;" /><br /><br />
-    <button type="submit">Start Debate</button>
-  </form>
+  <header>AI Debate Platform</header>
+  <div class="container">
+    <h1>Submit a Debate Topic</h1>
+    <form action="/debate/" method="get">
+      <label for="debate_topic">What should our AI agents debate about?</label>
+      <input type="text" id="debate_topic" name="debate_topic" required placeholder="e.g., Should a dog be allowed to be President?" />
+      <button type="submit">Start Debate</button>
+    </form>
+  </div>
 </body>
 </html>
