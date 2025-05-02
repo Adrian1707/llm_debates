@@ -12,5 +12,6 @@ from . import views
 load_dotenv()  # Loads .env file from current directory by default
 
 urlpatterns = [
-    path('', views.hello_world, name='hello_world'),
+    path('', views.submit_topic, name='submit_topic'),
+    path('debate/', views.hello_world, name='hello_world'),
 ]
