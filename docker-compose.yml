@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=1
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    stdin_open: true  # Keep STDIN open
+    tty: true         # Allocate a pseudo-TTY
