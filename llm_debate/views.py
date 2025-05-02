@@ -31,7 +31,7 @@ def hello_world(request):
 
         def event_stream():
             # Opening statement FOR side
-            yield "data:### FOR:\n\n"
+            yield "data:### AGAINST:\n\n"
             for chunk in agent_for.respond("Please provide your opening statement."):
                 # Ensure each chunk is properly formatted with spaces
                 chunk_text = _safe_decode(chunk)
@@ -41,7 +41,7 @@ def hello_world(request):
                 yield f"data:{chunk_text}\n\n"
 
             # Opening statement AGAINST side responds to FOR's opener
-            yield "data:### AGAINST:\n\n"
+            yield "data:### FOR:\n\n"
             for chunk in agent_against.respond(agent_for.previous_arguments[-1]):
                 chunk_text = _safe_decode(chunk)
                 if chunk_text and chunk_text[-1] in ['.', ',', '!', '?', ':', ';'] and len(chunk_text) > 1:
@@ -54,7 +54,7 @@ def hello_world(request):
             for round_num in range(1, max_rounds):
                 if current_turn == 'for':
                     opponent_argument = agent_against.previous_arguments[-1]
-                    yield "data:### FOR:\n\n"
+                    yield "data:### AGAINST:\n\n"
                     for chunk in agent_for.respond(opponent_argument):
                         chunk_text = _safe_decode(chunk)
                         if chunk_text and chunk_text[-1] in ['.', ',', '!', '?', ':', ';'] and len(chunk_text) > 1:
@@ -63,7 +63,7 @@ def hello_world(request):
                     current_turn = 'against'
                 else:
                     opponent_argument = agent_for.previous_arguments[-1]
-                    yield "data:### AGAINST:\n\n"
+                    yield "data:### FOR:\n\n"
                     for chunk in agent_against.respond(opponent_argument):
                         chunk_text = _safe_decode(chunk)
                         if chunk_text and chunk_text[-1] in ['.', ',', '!', '?', ':', ';'] and len(chunk_text) > 1:
