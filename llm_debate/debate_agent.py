@@ -58,7 +58,6 @@ class DebateAgent:
                         data = json.loads(line.decode('utf-8'))
                         chunk = data.get('response', '')
                         if chunk != "</think>" and chunk != "<think>":
-                            print(chunk, end='', flush=True)
                             collected_response += chunk
                             yield chunk  # Real-time token stream
 
