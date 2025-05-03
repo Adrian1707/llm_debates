@@ -40,9 +40,58 @@ class DebateAgent:
         """
         return prompt
 
-    def respond(self, opponent_argument):
+    def respond(self, opponent_argument: str):
         prompt_message = self.build_debate_prompt(opponent_argument)
+        
+        url = "http://host.docker.internal:11434/api/generate"
+        headers = {"Content-Type": "application/json"}
+        payload = {
+            "model": "qwen3:30b-a3b",
+            "prompt": prompt_message,
+            "stream": True,
+        }
+
+        buffer = ""  # Buffer to hold partial words
+        
         try:
+            with requests.post(url, headers=headers, json=payload, stream=True, timeout=30) as response:
+                response.raise_for_status()
+                for line in response.iter_lines():
+                    if line:
+                        try:
+                            data_str = line.decode('utf-8')
+                            data = json.loads(data_str)
+                            chunk = data.get('response', '')
+                            
+                            # Filter out control tokens
+                            if chunk not in ("</think>", "<think>"):
+                                # Append new chunk to buffer
+                                buffer += chunk
+                                
+                                # Split into parts
+                                parts = buffer.split()
+
+                                if parts:
+                                    # Yield all complete words (except last)
+                                    for word in parts[:-1]:
+                                        yield word + ' '
+                                    # Keep the last part (possibly incomplete)
+                                    buffer = parts[-1]
+                                else:
+                                    # No words yet; keep buffer as-is (possibly whitespace)
+                                    continue
+
+                        except (json.JSONDecodeError, UnicodeDecodeError):
+                            continue
+
+            # After stream ends, check if there's an incomplete word left
+            if buffer.strip():
+                yield buffer + ' '
+                
+        except requests.RequestException as e:
+            print(f"Request failed: {e}")
+            prompt_message = self.build_debate_prompt(opponent_argument)
+            
             url = "http://host.docker.internal:11434/api/generate"
             headers = {"Content-Type": "application/json"}
             payload = {
@@ -51,17 +100,38 @@ class DebateAgent:
                 "stream": True,
             }
 
-            collected_response = ""
-            with requests.post(url, headers=headers, json=payload, stream=True) as response:
-                response.raise_for_status()
-                for line in response.iter_lines():
-                    if line:
-                        data = json.loads(line.decode('utf-8'))
-                        chunk = data.get('response', '')
-                        if chunk != "</think>" and chunk != "<think>":
-                            collected_response += chunk
-                            yield chunk
+            buffer = ""  # Buffer to hold partial words
+            
+            try:
+                with requests.post(url, headers=headers, json=payload, stream=True, timeout=30) as response:
+                    response.raise_for_status()
+                    for line in response.iter_lines():
+                        if line:
+                            try:
+                                data_str = line.decode('utf-8')
+                                data = json.loads(data_str)
+                                chunk = data.get('response', '')
+                                
+                                # Filter out control tokens
+                                if chunk not in ("</think>", "<think>"):
+                                    # Append new chunk to buffer
+                                    buffer += chunk
+                                    
+                                    # Split into words; keep last part if incomplete
+                                    parts = buffer.split()
+                                    
+                                    # All but last are complete words
+                                    for word in parts[:-1]:
+                                        yield word + ' '
+                                    
+                                    # Last part might be incomplete; keep it in buffer
+                                    buffer = parts[-1]
+                            except (json.JSONDecodeError, UnicodeDecodeError):
+                                continue
 
-            self.previous_arguments.append(collected_response.strip())
-        except Exception as e:
-            raise RuntimeError(f"Failed to complete local LLM call: {e}")
+                # After stream ends, check if there's an incomplete word left
+                if buffer:
+                    yield buffer + ' '
+                    
+            except requests.RequestException as e:
+                print(f"Request failed: {e}")

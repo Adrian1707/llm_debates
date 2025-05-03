@@ -30,9 +30,16 @@ def debate(request):
                     chunk_text += ' '
                 yield f"data:{chunk_text}\n\n"
 
+            # Check if previous_arguments exists and is non-empty
+            if hasattr(agent_for, 'previous_arguments') and agent_for.previous_arguments:
+                previous_arg = agent_for.previous_arguments[-1]
+            else:
+                # Handle the case where previous_arguments is missing or empty
+                previous_arg = ""  # Or set to some default value
+
             # Opening statement AGAINST side responds to FOR's opener
             yield "data:### AGAINST:\n\n"
-            for chunk in agent_against.respond(agent_for.previous_arguments[-1]):
+            for chunk in agent_against.respond(previous_arg):
                 # Ensure each chunk is properly formatted with spaces
                 chunk_text = _safe_decode(chunk)
                 # Add a space after punctuation if needed
@@ -45,7 +52,12 @@ def debate(request):
 
             for round_num in range(1, max_rounds):
                 if current_turn == 'for':
-                    opponent_argument = agent_against.previous_arguments[-1]
+                    # Check if previous_arguments exists and is non-empty
+                    opponent_argument = (
+                        agent_against.previous_arguments[-1]
+                        if hasattr(agent_against, 'previous_arguments') and agent_against.previous_arguments
+                        else ""  # Or some default prompt
+                    )
                     yield "data:### FOR:\n\n"
                     for chunk in agent_for.respond(opponent_argument):
                         chunk_text = _safe_decode(chunk)
@@ -54,7 +66,12 @@ def debate(request):
                         yield f"data:{chunk_text}\n\n"
                     current_turn = 'against'
                 else:
-                    opponent_argument = agent_for.previous_arguments[-1]
+                    # Similarly for the 'against' side
+                    opponent_argument = (
+                        agent_for.previous_arguments[-1]
+                        if hasattr(agent_for, 'previous_arguments') and agent_for.previous_arguments
+                        else ""  # Or some default prompt
+                    )
                     yield "data:### AGAINST:\n\n"
                     for chunk in agent_against.respond(opponent_argument):
                         chunk_text = _safe_decode(chunk)
