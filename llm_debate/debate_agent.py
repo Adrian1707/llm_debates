@@ -1,10 +1,6 @@
 import os
 import json
-from typing import Optional
-from dotenv import load_dotenv
 import requests
-
-load_dotenv()  # Loads .env file from current directory by default
 
 class DebateAgent:
     def __init__(self, side, topic):
@@ -59,18 +55,8 @@ class DebateAgent:
                         chunk = data.get('response', '')
                         if chunk != "</think>" and chunk != "<think>":
                             collected_response += chunk
-                            yield chunk  # Real-time token stream
+                            yield chunk
 
             self.previous_arguments.append(collected_response.strip())
-
-        except json.JSONDecodeError as e:
-            raise RuntimeError(f"Failed to parse JSON response from OpenAI API. Response was:\n{reply_content}") from e
         except Exception as e:
-            raise RuntimeError(f"Failed to classify email: {e}")
-
-import re
-
-def is_valid_text(text):
-    # Define a regex pattern that matches valid text (letters, numbers, spaces, punctuation)
-    # You can adjust this pattern as needed
-    return bool(re.match(r'^[\w\s\.,!?\-\'\";:()]+$', text))
+            raise RuntimeError(f"Failed to complete local LLM call: {e}")
