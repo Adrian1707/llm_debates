@@ -61,41 +61,97 @@
       font-family: 'Courier New', Courier, monospace;
       color: #cfd8dc;
     }
+    .for .debate-side {
+      color: #00bcd4;
+    }
+    .against .debate-side {
+      color: #ff5722;
+    }
+    #topic-container {
+      text-align: center;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: #2a2a2a;
+      border-radius: 8px;
+    }
+    #debate-topic {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #ffffff;
+    }
   </style>
 </head>
 <body>
   <header>Live Debate Stream</header>
-  <main id="debate-container">
-    <p>Loading debate...</p>
+  <main>
+    <div id="topic-container">
+      <div id="debate-topic">Topic: {{ debate_topic }}</div>
+    </div>
+    <div id="debate-container"></div>
   </main>
   <script>
     const debateContainer = document.getElementById('debate-container');
-    debateContainer.innerHTML = '';
-
-    const evtSource = new EventSource('/debate/stream?debate_topic={{ debate_topic|urlencode }}');
-
-    evtSource.onmessage = function(event) {
-      if (!event.data) return;
-      const data = JSON.parse(event.data);
+    let currentSide = null;
+    let currentEntry = null;
+    let currentText = '';
+    
+    // Function to create a new debate entry
+    function createDebateEntry(side) {
       const entryDiv = document.createElement('div');
       entryDiv.classList.add('debate-entry');
-      entryDiv.classList.add(data.side.toLowerCase());
+      entryDiv.classList.add(side.toLowerCase());
 
       const sideDiv = document.createElement('div');
       sideDiv.classList.add('debate-side');
-      sideDiv.textContent = data.side;
+      sideDiv.textContent = side;
 
       const textDiv = document.createElement('div');
       textDiv.classList.add('debate-text');
-      textDiv.textContent = data.text;
-
+      
       entryDiv.appendChild(sideDiv);
       entryDiv.appendChild(textDiv);
       debateContainer.appendChild(entryDiv);
+      
+      return { entryDiv, textDiv };
+    }
 
-      debateContainer.scrollTop = debateContainer.scrollHeight;
+    // Set up EventSource for server-sent events
+    const evtSource = new EventSource(window.location.href);
+    
+    evtSource.onmessage = function(event) {
+      const data = event.data;
+      
+      // Check if this is a new side marker (### FOR: or ### AGAINST:)
+      if (data.startsWith('### FOR:')) {
+        currentSide = 'FOR';
+        const entry = createDebateEntry(currentSide);
+        currentEntry = entry.textDiv;
+        currentText = '';
+      } else if (data.startsWith('### AGAINST:')) {
+        currentSide = 'AGAINST';
+        const entry = createDebateEntry(currentSide);
+        currentEntry = entry.textDiv;
+        currentText = '';
+      } else if (currentEntry) {
+        // Append text to the current entry
+        // Add a space before each chunk to ensure words are separated
+        // But don't add a space at the beginning of a new entry
+        if (currentText.length > 0) {
+          // Only add a space if the last character isn't already a space, newline, or punctuation
+          const lastChar = currentText.charAt(currentText.length - 1);
+          if (![' ', '\n', '.', ',', '!', '?', ':', ';'].includes(lastChar) && data.charAt(0) !== ' ') {
+            currentText += ' ';
+          }
+        }
+        
+        currentText += data;
+        currentEntry.textContent = currentText;
+        
+        // Auto-scroll to the bottom
+        debateContainer.scrollTop = debateContainer.scrollHeight;
+      }
     };
-
+    
     evtSource.onerror = function() {
       const errorMsg = document.createElement('p');
       errorMsg.style.color = 'red';

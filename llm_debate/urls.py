@@ -13,5 +13,5 @@ load_dotenv()  # Loads .env file from current directory by default
 
 urlpatterns = [
     path('', views.submit_topic, name='submit_topic'),
-    path('debate/', views.hello_world, name='hello_world'),
+    path('debate/', views.debate, name='debate'),
 ]

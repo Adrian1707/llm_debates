@@ -11,7 +11,7 @@ def submit_topic(request):
     """Render a form for the user to submit a debate topic."""
     return render(request, 'submit_topic.html')
 
-def hello_world(request):
+def debate(request):
     debate_topic = request.GET.get('debate_topic')
     if not debate_topic:
         debate_topic = "Should a dog be allowed to be President"
@@ -66,7 +66,7 @@ def hello_world(request):
         return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
     else:
         # Initial page load - render the template
-        return render(request, 'hello_debate.html', {'debate_topic': debate_topic})
+        return render(request, 'debate.html', {'debate_topic': debate_topic})
 
 def _safe_decode(data):
     """Decode bytes to UTF-8, replacing invalid characters."""
