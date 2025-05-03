@@ -3,9 +3,13 @@ import json
 import requests
 
 class DebateAgent:
-    def __init__(self, side, topic):
-        self.side = side  # 'for' or 'against'
+    def __init__(self, for_or_against, topic):
+        if for_or_against == 'for':
+            self.side = 'in favor'
+        else:
+            self.side = 'not in favor'
         self.topic = topic
+        self.for_or_against = for_or_against
         self.previous_arguments = []  # Track what was said in previous rounds
     
     def build_debate_prompt(self, opponent_argument):
@@ -13,8 +17,8 @@ class DebateAgent:
         prompt = f"""
             /no_think
             You are engaged in a direct, one-on-one debate with your opponent on the following topic:
-
             "{self.topic}"
+            You are "{self.side}" of this so you will argue "{self.for_or_against}" the topic in question.
 
             Instructions:
             - Respond conversationally and directly to your opponent's last argument below.

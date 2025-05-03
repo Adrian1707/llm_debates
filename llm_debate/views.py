@@ -18,24 +18,24 @@ def debate(request):
     
     # Check if this is an SSE request or the initial page load
     if request.headers.get('accept') == 'text/event-stream':
-        agent_for = DebateAgent(side='for', topic=debate_topic)
-        agent_against = DebateAgent(side='against', topic=debate_topic)
+        agent_for = DebateAgent(for_or_against='for', topic=debate_topic)
+        agent_against = DebateAgent(for_or_against='against', topic=debate_topic)
 
         def event_stream():
             # Opening statement FOR side
-            yield "data:### AGAINST:\n\n"
+            yield "data:### FOR:\n\n"
             for chunk in agent_for.respond("Please provide your opening statement."):
-                # Ensure each chunk is properly formatted with spaces
                 chunk_text = _safe_decode(chunk)
-                # Add a space after punctuation if needed
                 if chunk_text and chunk_text[-1] in ['.', ',', '!', '?', ':', ';'] and len(chunk_text) > 1:
                     chunk_text += ' '
                 yield f"data:{chunk_text}\n\n"
 
             # Opening statement AGAINST side responds to FOR's opener
-            yield "data:### FOR:\n\n"
+            yield "data:### AGAINST:\n\n"
             for chunk in agent_against.respond(agent_for.previous_arguments[-1]):
+                # Ensure each chunk is properly formatted with spaces
                 chunk_text = _safe_decode(chunk)
+                # Add a space after punctuation if needed
                 if chunk_text and chunk_text[-1] in ['.', ',', '!', '?', ':', ';'] and len(chunk_text) > 1:
                     chunk_text += ' '
                 yield f"data:{chunk_text}\n\n"
@@ -46,7 +46,7 @@ def debate(request):
             for round_num in range(1, max_rounds):
                 if current_turn == 'for':
                     opponent_argument = agent_against.previous_arguments[-1]
-                    yield "data:### AGAINST:\n\n"
+                    yield "data:### FOR:\n\n"
                     for chunk in agent_for.respond(opponent_argument):
                         chunk_text = _safe_decode(chunk)
                         if chunk_text and chunk_text[-1] in ['.', ',', '!', '?', ':', ';'] and len(chunk_text) > 1:
@@ -55,7 +55,7 @@ def debate(request):
                     current_turn = 'against'
                 else:
                     opponent_argument = agent_for.previous_arguments[-1]
-                    yield "data:### FOR:\n\n"
+                    yield "data:### AGAINST:\n\n"
                     for chunk in agent_against.respond(opponent_argument):
                         chunk_text = _safe_decode(chunk)
                         if chunk_text and chunk_text[-1] in ['.', ',', '!', '?', ':', ';'] and len(chunk_text) > 1:
