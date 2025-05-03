@@ -21,6 +21,7 @@ class DebateAgent:
             - DO NOT start your reply with any formal salutation (e.g., "Ladies and gentlemen", "esteemed judges", etc.).
             - Focus only on addressing your opponent's points and advancing your case.
             - Maintain a natural, professional tone as if speaking directly to another expert—not an audience.
+            - Look through your previous arguments and make sure you do not repeat any of these arguments. Take the debate into another direction and expand on the topic in a multi-disciplinary way.
             - Build on both your own previous arguments and theirs for coherence.
             - Use examples, data, and logic as needed.
             - Write a detailed response (about 300–400 words).
