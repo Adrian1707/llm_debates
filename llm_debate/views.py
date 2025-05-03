@@ -85,8 +85,23 @@ def stream_agent_response(header, agent, prompt, stream_speed='slow'):
         chunk_text = safe_decode(chunk)
         if should_add_space(chunk_text):
             chunk_text += ' '
-        
-        yield f"data:{chunk_text}\n\n"
+        if should_add_new_line(chunk_text):
+            # Split on the first '.' only
+            before, sep, after = chunk_text.partition('.')
+            # FIX THIS TO ALLOW FOR NEW PARAGRAPHS
+            if False:  # Only split if '.' is found
+                # Strip spaces for clean formatting
+                print("=================================")
+                print(chunk_text)
+                before = before.rstrip()
+                after = after.lstrip()
+                yield f"data:{before}.\n"
+                yield f"data:{after}\n"
+            else:
+                # Fallback: no '.' found, just yield as usual
+                yield f"data:{chunk_text}\n\n"
+        else:
+            yield f"data:{chunk_text}\n\n"
         
         # Add delay if needed (skip for empty chunks)
         if delay > 0 and chunk_text.strip():
@@ -122,6 +137,22 @@ def get_last_argument(agent):
         return agent.previous_arguments[-1]
     return ""
 
+def should_add_new_line(s: str) -> bool:
+    """
+    Check if the string has the format 'part1.part2' with exactly one dot,
+    and both parts are non-empty.
+
+    Args:
+        s (str): The input string to check.
+
+    Returns:
+        bool: True if the format is valid, False otherwise.
+    """
+    # Split the string by '.' and check that there's exactly one split
+    parts = s.split('.')
+    
+    # Check for exactly two parts, and both are non-empty
+    return len(parts) == 2 and all(part.strip() for part in parts)
 
 def should_add_space(text):
     """
@@ -130,7 +161,7 @@ def should_add_space(text):
     """
     if not text or len(text) <= 1:
         return False
-    print(text[-1])
+
     # Add space after punctuation
     if text[-1] in ['.', '. ' ',', '!', '?', ':', ';', '-']:
         return True
