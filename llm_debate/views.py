@@ -120,14 +120,13 @@ def get_stream_delay(stream_speed):
     """
     # Get delay settings from Django settings or use defaults
     delay_settings = getattr(settings, 'STREAM_DELAY_SETTINGS', {
-        'slow': 0.5,
-        'medium': 0.05, 
-        'fast': 0.02,
+        'slow': 0.3,
+        'medium': 0.2, 
+        'fast': 0.1,
         'instant': 0
     })
     
     # Default to medium if an invalid speed is provided
-    return 0
     return delay_settings.get(stream_speed, delay_settings['slow'])
 
 
