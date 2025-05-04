@@ -144,7 +144,24 @@
           }
         }
         
-        currentText += data;
+        // Split letter followed by digit with a space
+        let processedData = data.replace(/([a-zA-Z])(\d)/g, '$1 $2');
+
+        // Check for "word.Word" pattern (excluding "Upper.Upper") and split/append with newline
+        if (/\b[a-zA-Z]+\.[a-zA-Z]+\b/.test(processedData) && !/[A-Z]\.[A-Z]/.test(processedData)) {
+          const parts = processedData.split('.', 2); // Split into at most 2 parts
+          if (parts.length === 2) {
+            currentText += parts[0] + '.\n\n';
+            currentText += parts[1];
+          } else {
+            // If split didn't result in two parts, just append the processed data
+            currentText += processedData;
+          }
+        } else {
+          // If pattern doesn't match or is "Upper.Upper", just append the processed data
+          currentText += processedData;
+        }
+        
         currentEntry.textContent = currentText;
         
         // Auto-scroll to the bottom
