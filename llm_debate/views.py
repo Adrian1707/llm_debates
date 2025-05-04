@@ -85,23 +85,8 @@ def stream_agent_response(header, agent, prompt, stream_speed='slow'):
         chunk_text = safe_decode(chunk)
         if should_add_space(chunk_text):
             chunk_text += ' '
-        if should_add_new_line(chunk_text):
-            # Split on the first '.' only
-            before, sep, after = chunk_text.partition('.')
-            # FIX THIS TO ALLOW FOR NEW PARAGRAPHS
-            if False:  # Only split if '.' is found
-                # Strip spaces for clean formatting
-                print("=================================")
-                print(chunk_text)
-                before = before.rstrip()
-                after = after.lstrip()
-                yield f"data:{before}.\n"
-                yield f"data:{after}\n"
-            else:
-                # Fallback: no '.' found, just yield as usual
-                yield f"data:{chunk_text}\n\n"
-        else:
-            yield f"data:{chunk_text}\n\n"
+        
+        yield f"data:{chunk_text}\n\n"
         
         # Add delay if needed (skip for empty chunks)
         if delay > 0 and chunk_text.strip():
