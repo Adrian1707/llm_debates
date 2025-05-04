@@ -102,7 +102,7 @@ class DebateAgent:
             # For this task, we'll assume successful response is needed to add to history.
             prompt_message = self.build_debate_prompt(opponent_argument)
 
-            url = "http://host.docker.internal:11434/api/generate"
+            url = "http://ollama:11434/api/generate"
             headers = {"Content-Type": "application/json"}
             payload = {
                 "model": "qwen3:30b-a3b",
