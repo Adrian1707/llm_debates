@@ -12,9 +12,6 @@ services:
     environment:
       - DEBUG=1
       - PYTHONUNBUFFERED=1
-      - OLLAMA_API_URL=http://ollama:11434
-      # Pass the model name (using the same default logic)
-      - OLLAMA_MODEL=qwen3:30b-a3b
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     restart: unless-stopped
     stdin_open: true
