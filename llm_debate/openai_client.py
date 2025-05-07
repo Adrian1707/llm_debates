@@ -1,11 +1,12 @@
 from openai import OpenAI
+import os
 from llm_debate.llm_client import LLMClient
 from openai.types.responses import ResponseTextDeltaEvent
 
 class OpenAIClient(LLMClient):
     def __init__(self):
         self.client = OpenAI(
-            api_key=OPENAI_API_KEY
+            api_key=os.getenv("OPENAI_API_KEY")
         )
         self.previous_arguments = []
     

@@ -15,11 +15,12 @@ services:
       - OLLAMA_API_URL=http://ollama:11434
       # Pass the model name (using the same default logic)
       - OLLAMA_MODEL=qwen3:30b-a3b
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     restart: unless-stopped
     stdin_open: true
     tty: true
-    networks:
-      - app_network
+    # networks:
+    #   - app_network
     # depends_on:
     #   # Changed condition: Wait for Ollama to be healthy (requires healthcheck)
     #   # If you don't add a healthcheck, use 'service_started' but be aware
@@ -27,45 +28,45 @@ services:
     #   ollama:
     #     condition: service_healthy # Or use service_started if no healthcheck
 
-  ollama:
-    image: ollama/ollama:latest
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-      # Mount the entrypoint script into the container
-      - ./ollama_entrypoint.sh:/usr/local/bin/ollama_entrypoint.sh
-    container_name: ollama_server
-    restart: unless-stopped
-    environment:
-      # Define the model to pull (can be overridden by .env file or host env)
-      - OLLAMA_MODEL_TO_PULL=qwen3:30b-a3b
-      # Optional: Configure Ollama host/port if needed inside container (usually defaults are fine)
-      # - OLLAMA_HOST=0.0.0.0
-    # --- Use the custom entrypoint script ---
-    entrypoint: ["/usr/local/bin/ollama_entrypoint.sh"]
-    # --- Add a Healthcheck (Recommended) ---
-    # This checks if the Ollama API is responding before marking the service healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"] # Check if API endpoint is reachable
-      interval: 15s # Check every 15 seconds
-      timeout: 10s  # Wait max 10 seconds for response
-      retries: 5    # Retry 5 times before marking unhealthy
-      start_period: 20s # Grace period after container starts before first check
-    networks:
-      - app_network
-    # --- Optional: GPU Acceleration ---
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
+#   ollama:
+#     image: ollama/ollama:latest
+#     ports:
+#       - "11434:11434"
+#     volumes:
+#       - ollama_data:/root/.ollama
+#       # Mount the entrypoint script into the container
+#       - ./ollama_entrypoint.sh:/usr/local/bin/ollama_entrypoint.sh
+#     container_name: ollama_server
+#     restart: unless-stopped
+#     environment:
+#       # Define the model to pull (can be overridden by .env file or host env)
+#       - OLLAMA_MODEL_TO_PULL=qwen3:30b-a3b
+#       # Optional: Configure Ollama host/port if needed inside container (usually defaults are fine)
+#       # - OLLAMA_HOST=0.0.0.0
+#     # --- Use the custom entrypoint script ---
+#     entrypoint: ["/usr/local/bin/ollama_entrypoint.sh"]
+#     # --- Add a Healthcheck (Recommended) ---
+#     # This checks if the Ollama API is responding before marking the service healthy
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"] # Check if API endpoint is reachable
+#       interval: 15s # Check every 15 seconds
+#       timeout: 10s  # Wait max 10 seconds for response
+#       retries: 5    # Retry 5 times before marking unhealthy
+#       start_period: 20s # Grace period after container starts before first check
+#     networks:
+#       - app_network
+#     # --- Optional: GPU Acceleration ---
+#     # deploy:
+#     #   resources:
+#     #     reservations:
+#     #       devices:
+#     #         - driver: nvidia
+#     #           count: 1
+#     #           capabilities: [gpu]
 
-networks:
-  app_network:
-    driver: bridge
+# networks:
+#   app_network:
+#     driver: bridge
 
-volumes:
-  ollama_data:
+# volumes:
+#   ollama_data:
