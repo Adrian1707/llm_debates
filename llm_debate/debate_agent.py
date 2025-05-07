@@ -2,6 +2,7 @@ import os
 import json
 import requests
 from llm_debate.ollama_client import OllamaClient
+from llm_debate.openai_client import OpenAIClient
 
 class DebateAgent:
     def __init__(self, for_or_against, topic):
@@ -12,6 +13,7 @@ class DebateAgent:
         self.topic = topic
         self.for_or_against = for_or_against
         self.llm_client = OllamaClient()
+        # self.llm_client = OpenAIClient()
     
     def build_debate_prompt(self, opponent_argument):
         self_history = "\n".join(f"{i+1}. {arg}" for i, arg in enumerate(self.llm_client.previous_arguments[-2:]))
@@ -44,3 +46,6 @@ class DebateAgent:
     def respond(self, opponent_argument: str):
         prompt_message = self.build_debate_prompt(opponent_argument)
         return self.llm_client.generate_response(prompt_message)
+
+    def previous_arguments():
+        return self.llm_client.previous_arguments

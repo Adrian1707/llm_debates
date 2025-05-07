@@ -1,29 +1,29 @@
-import openai
+from openai import OpenAI
+from llm_debate.llm_client import LLMClient
+from openai.types.responses import ResponseTextDeltaEvent
 
 class OpenAIClient(LLMClient):
-    def __init__(self, api_key: str, model: str = "gpt-3.5-turbo"):
-        self.api_key = api_key
-        self.model = model
+    def __init__(self):
+        self.client = OpenAI(
+            api_key=OPENAI_API_KEY
+        )
+        self.previous_arguments = []
     
     def generate_response(self, prompt_message: str):
         full_response = ""
-        response_stream = openai.ChatCompletion.create(
-            model=self.model,
-            messages=[{"role": "user", "content": prompt_message}],
+        
+        stream = self.client.responses.create(
+            model="gpt-4.1-nano",
+            input=prompt_message,
             stream=True,
-            api_key=self.api_key,
         )
 
         buffer = ""
         
-        for chunk in response_stream:
-            delta_content = ''
-            try:
-                delta_content = chunk['choices'][0]['delta'].get('content', '')
-            except (KeyError, IndexError):
-                continue
-            
-            if delta_content:
+        for chunk in stream:
+            if isinstance(chunk, ResponseTextDeltaEvent):
+                delta_content = chunk.delta 
+
                 buffer += delta_content
                 full_response += delta_content
 
@@ -36,8 +36,8 @@ class OpenAIClient(LLMClient):
                     # Keep the last part as it might be incomplete
                     buffer = parts[-1]
         
-        # After streaming ends, yield any remaining partial word
+                # After streaming ends, yield any remaining partial word
         if buffer.strip():
             yield buffer + ' '
-        
+
         self.previous_arguments.append(full_response.strip())

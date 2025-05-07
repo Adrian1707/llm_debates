@@ -47,7 +47,7 @@ def generate_debate_stream(agent_for, agent_against, stream_speed='slow'):
     """Generate the debate content as a stream of SSE events."""
     # Opening statements
     yield from stream_agent_response("### FOR:\n\n", agent_for, "Please provide your opening statement.", stream_speed)
-    
+
     opening_argument = get_last_argument(agent_for)
     yield from stream_agent_response("### AGAINST:\n\n", agent_against, opening_argument, stream_speed)
     
@@ -82,6 +82,7 @@ def stream_agent_response(header, agent, prompt, stream_speed='slow'):
     delay = get_stream_delay(stream_speed)
     
     for chunk in agent.respond(prompt):
+        # print(chunk)
         chunk_text = safe_decode(chunk)
         if should_add_space(chunk_text):
             chunk_text += ' '
@@ -117,6 +118,7 @@ def get_stream_delay(stream_speed):
 
 def get_last_argument(agent):
     """Safely get the last argument from an agent."""
+    return agent.llm_client.previous_arguments
     if hasattr(agent, 'previous_arguments') and agent.previous_arguments:
         return agent.previous_arguments[-1]
     return ""
