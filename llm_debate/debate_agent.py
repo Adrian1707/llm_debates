@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+from llm_debate.ollama_client import OllamaClient
 
 class DebateAgent:
     def __init__(self, for_or_against, topic):
@@ -10,10 +11,10 @@ class DebateAgent:
             self.side = 'not in favor'
         self.topic = topic
         self.for_or_against = for_or_against
-        self.previous_arguments = []  # Track what was said in previous rounds
+        self.llm_client = OllamaClient()
     
     def build_debate_prompt(self, opponent_argument):
-        self_history = "\n".join(f"{i+1}. {arg}" for i, arg in enumerate(self.previous_arguments[-2:]))
+        self_history = "\n".join(f"{i+1}. {arg}" for i, arg in enumerate(self.llm_client.previous_arguments[-2:]))
         prompt = f"""
             /no_think
             You are engaged in a direct, one-on-one debate with your opponent on the following topic:
@@ -42,59 +43,4 @@ class DebateAgent:
 
     def respond(self, opponent_argument: str):
         prompt_message = self.build_debate_prompt(opponent_argument)
-        
-        url = "http://host.docker.internal:11434/api/generate"
-        # url = "http://ollama:11434/api/generate"
-        headers = {"Content-Type": "application/json"}
-        payload = {
-            "model": "qwen3:30b-a3b",
-            "prompt": prompt_message,
-            "stream": True,
-        }
-
-        buffer = ""  # Buffer to hold partial words
-        full_response = "" # Accumulate the full response
-
-        try:
-            with requests.post(url, headers=headers, json=payload, stream=True, timeout=30) as response:
-                response.raise_for_status()
-                for line in response.iter_lines():
-                    if line:
-                        try:
-                            data_str = line.decode('utf-8')
-                            data = json.loads(data_str)
-                            chunk = data.get('response', '')
-
-                            # Filter out control tokens
-                            if chunk not in ("</think>", "<think>"):
-                                # Append new chunk to buffer and full response
-                                buffer += chunk
-                                full_response += chunk
-
-                                # Split into parts
-                                parts = buffer.split()
-
-                                if parts:
-                                    # Yield all complete words (except last)
-                                    for word in parts[:-1]:
-                                        yield word + ' '
-                                    # Keep the last part (possibly incomplete)
-                                    buffer = parts[-1]
-                                else:
-                                    # No words yet; keep buffer as-is (possibly whitespace)
-                                    continue
-
-                        except (json.JSONDecodeError, UnicodeDecodeError):
-                            continue
-
-            # After stream ends, check if there's an incomplete word left
-            if buffer.strip():
-                yield buffer + ' '
-
-            # Append the full response to previous_arguments
-            self.previous_arguments.append(full_response.strip())
-
-        except requests.RequestException as e:
-            print(f"Request failed: {e}")
-            # Re-raise or handle the exception as appropriate
-            raise e
+        return self.llm_client.generate_response(prompt_message)
