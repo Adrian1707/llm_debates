@@ -19,54 +19,58 @@ def debate(request):
     Supports both initial page load and server-sent events (SSE).
     """
     debate_topic = request.GET.get('debate_topic', "Should a dog be allowed to be President")
-    
+    print("DEBATE TOPIC:", debate_topic)
+
     # Get streaming speed from request or use default
     stream_speed = request.GET.get('stream_speed', 'slow')
+
+    # Get debate style
+    debate_style = request.GET.get('debate_style', 'civil')
     
     if request.headers.get('accept') == 'text/event-stream':
-        return handle_debate_stream(debate_topic, stream_speed)
+        return handle_debate_stream(debate_topic, stream_speed, debate_style)
     else:
         return render(request, 'debate.html', {
             'debate_topic': debate_topic,
-            'stream_speed': stream_speed
+            'stream_speed': stream_speed,
+            'debate_style': debate_style
         })
 
 
-def handle_debate_stream(debate_topic, stream_speed='slow'):
+def handle_debate_stream(debate_topic, stream_speed, debate_style):
     """Handle the SSE stream for a debate on the given topic."""
     agent_for = DebateAgent(for_or_against='for', topic=debate_topic)
     agent_against = DebateAgent(for_or_against='against', topic=debate_topic)
     
     return StreamingHttpResponse(
-        generate_debate_stream(agent_for, agent_against, stream_speed), 
+        generate_debate_stream(agent_for, agent_against, stream_speed, debate_style), 
         content_type='text/event-stream'
     )
 
 
-def generate_debate_stream(agent_for, agent_against, stream_speed='slow'):
+def generate_debate_stream(agent_for, agent_against, stream_speed, debate_style):
     """Generate the debate content as a stream of SSE events."""
-    # Opening statements
-    yield from stream_agent_response("### FOR:\n\n", agent_for, "Please provide your opening statement.", stream_speed)
+    yield from stream_agent_response("### FOR:\n\n", agent_for, "Please provide your opening statement.", stream_speed, debate_style)
 
     opening_argument = get_last_argument(agent_for)
-    yield from stream_agent_response("### AGAINST:\n\n", agent_against, opening_argument, stream_speed)
+    yield from stream_agent_response("### AGAINST:\n\n", agent_against, opening_argument, stream_speed, debate_style)
     
     # Subsequent rounds
     current_turn = 'for'
-    max_rounds = 5
+    max_rounds = 6
     
     for _ in range(1, max_rounds):
         if current_turn == 'for':
             opponent_argument = get_last_argument(agent_against)
-            yield from stream_agent_response("### FOR:\n\n", agent_for, opponent_argument, stream_speed)
+            yield from stream_agent_response("### FOR:\n\n", agent_for, opponent_argument, stream_speed, debate_style)
             current_turn = 'against'
         else:
             opponent_argument = get_last_argument(agent_for)
-            yield from stream_agent_response("### AGAINST:\n\n", agent_against, opponent_argument, stream_speed)
+            yield from stream_agent_response("### AGAINST:\n\n", agent_against, opponent_argument, stream_speed, debate_style)
             current_turn = 'for'
 
 
-def stream_agent_response(header, agent, prompt, stream_speed='slow'):
+def stream_agent_response(header, agent, prompt, stream_speed, debate_style):
     """
     Stream an agent's response with proper formatting and controlled speed.
     
@@ -81,7 +85,7 @@ def stream_agent_response(header, agent, prompt, stream_speed='slow'):
     # Get delay in seconds based on stream_speed
     delay = get_stream_delay(stream_speed)
     
-    for chunk in agent.respond(prompt):
+    for chunk in agent.respond(prompt, debate_style):
         # print(chunk)
         chunk_text = safe_decode(chunk)
         if should_add_space(chunk_text):

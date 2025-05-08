@@ -171,8 +171,8 @@
     
     evtSource.onerror = function() {
       const errorMsg = document.createElement('p');
-      errorMsg.style.color = 'red';
-      errorMsg.textContent = 'Connection lost. Please refresh the page.';
+      errorMsg.style.color = 'green';
+      errorMsg.textContent = 'Debate has concluded. Who do you think won?';
       debateContainer.appendChild(errorMsg);
       evtSource.close();
     };

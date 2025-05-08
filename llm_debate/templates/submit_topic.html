@@ -98,12 +98,24 @@
       <label for="debate_topic">What should our AI agents debate about?</label>
       <input type="text" id="debate_topic" name="debate_topic" required />
 
+
+      <label for="debate_style">Debate Style:</label>
+      <select id="debate_style" name="debate_style">
+        <option value="civil">Civil</option>
+        <option value="adversarial">Adversarial</option>
+      </select>
+
       <label for="stream_speed">Stream Speed:</label>
       <select id="stream_speed" name="stream_speed">
         <option value="slow">Slow</option>
         <option value="medium">Medium</option>
         <option value="fast">Fast</option>
         <option value="instant">Instant</option>
+      </select>
+
+      <label for="response_count">Response Count</label>
+      <select id="response_count" name="response_count">
+        <option value="slow">7</option>
       </select>
 
       <button type="submit">Start Debate</button>
