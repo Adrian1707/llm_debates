@@ -50,7 +50,7 @@ def handle_debate_stream(debate_topic, stream_speed, debate_style):
 
 def generate_debate_stream(agent_for, agent_against, stream_speed, debate_style):
     """Generate the debate content as a stream of SSE events."""
-    yield from stream_agent_response("### FOR:\n\n", agent_for, "Please provide a response to the topic arguing in favour of it", stream_speed, debate_style)
+    yield from stream_agent_response("### FOR:\n\n", agent_for, f"Please provide a response to the topic, agreeing and defending this issue: {agent_for.topic}", stream_speed, 'civil', True)
 
     opening_argument = get_last_argument(agent_for)
     yield from stream_agent_response("### AGAINST:\n\n", agent_against, opening_argument, stream_speed, debate_style)
@@ -70,7 +70,7 @@ def generate_debate_stream(agent_for, agent_against, stream_speed, debate_style)
             current_turn = 'for'
 
 
-def stream_agent_response(header, agent, prompt, stream_speed, debate_style):
+def stream_agent_response(header, agent, prompt, stream_speed, debate_style, opening=False):
     """
     Stream an agent's response with proper formatting and controlled speed.
     
@@ -85,7 +85,7 @@ def stream_agent_response(header, agent, prompt, stream_speed, debate_style):
     # Get delay in seconds based on stream_speed
     delay = get_stream_delay(stream_speed)
     
-    for chunk in agent.respond(prompt, debate_style):
+    for chunk in agent.respond(prompt, debate_style, opening):
         # print(chunk)
         chunk_text = safe_decode(chunk)
         if should_add_space(chunk_text):

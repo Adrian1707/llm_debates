@@ -15,10 +15,20 @@ class DebateAgent:
         # self.llm_client = OllamaClient()
         self.llm_client = OpenAIClient()
     
-    def build_debate_prompt(self, opponent_argument):
+    def build_debate_prompt(self, opponent_argument, opening):
         self_history = "\n".join(f"{i+1}. {arg}" for i, arg in enumerate(self.llm_client.previous_arguments[-2:]))
+        if opening == True:
+            opponent_said = f"""
+                Compose your response now—begin directly with substance.
+            """
+        else:
+            opponent_said = f"""
+                Opponent just said:
+                "{opponent_argument}"
+
+                Compose your response now—begin directly with substance.
+            """
         prompt = f"""
-            /no_think
             You are engaged in a direct, one-on-one debate with your opponent on the following topic:
             "{self.topic}"
             You are "{self.side}" of this so you will argue "{self.for_or_against}" the topic in question.
@@ -36,20 +46,28 @@ class DebateAgent:
             Your previous arguments:
             {self_history}
 
-            Opponent just said:
-            "{opponent_argument}"
-
-            Compose your response now—begin directly with substance.
+            {opponent_said}
         """
         return prompt
 
-    def build_adversarial_prompt(self, opponent_argument):
+    def build_adversarial_prompt(self, opponent_argument, opening):
         self_history = "\n".join(f"{i+1}. {arg}" for i, arg in enumerate(self.llm_client.previous_arguments[-2:]))
+        if opening == True:
+            opponent_said = f"""
+            Compose your response now—begin directly with substance.
+            """
+        else:
+            opponent_said = f"""
+                Opponent just said:
+                "{opponent_argument}"
+
+                Compose your response now—begin directly with substance.
+            """
+
         prompt = f"""
-            /no_think
             You are engaged in a direct, one-on-one debate with your opponent on the following topic:
             "{self.topic}"
-            You are "{self.side}" of this so you will argue "{self.for_or_against}" the topic in question.
+            You are heavily {self.side} of this so you will argue {self.for_or_against} the topic in question.
 
             Role: You are a relentless intellectual adversary tasked with systematically dismantling your opponents arguments and beliefs through ruthless scrutiny and logical dissection. Your purpose is to act as a merciless sparring partner in debate—no mercy will be shown because none is expected in return. Your goal is to force the user to critically re-examine their positions through intense scrutiny and relentless questioning. 
             
@@ -86,18 +104,15 @@ class DebateAgent:
             Your previous arguments:
             {self_history}
 
-            Opponent just said:
-            "{opponent_argument}"
-
-            Compose your response now—begin directly with substance.
+            {opponent_said}
         """
         return prompt
 
-    def respond(self, opponent_argument: str, debate_style: str):
+    def respond(self, opponent_argument: str, debate_style: str, opening: bool):
         if debate_style == 'civil':
-            prompt_message = self.build_debate_prompt(opponent_argument)
+            prompt_message = self.build_debate_prompt(opponent_argument, opening)
         elif debate_style == 'adversarial':
-            prompt_message = self.build_adversarial_prompt(opponent_argument)
+            prompt_message = self.build_adversarial_prompt(opponent_argument, opening)
         return self.llm_client.generate_response(prompt_message)
 
     def previous_arguments():
