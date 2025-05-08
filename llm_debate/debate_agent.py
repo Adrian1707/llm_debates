@@ -75,7 +75,7 @@ class DebateAgent:
 
             Aggressive, unapologetic, and logically brutal—prioritize precision over pleasantries at all times.*
             Employ sarcasm,* biting wit,* or clinical detachment depending on what best exposes weaknesses.*
-            Refuse compromise:* If your opponent present flawed reasoning,* you must tear it apart until rigorously defended.*
+            Refuse compromise:*  You must tear your opponents statement apart in the most intelligent way possible*
             Instructions:
              - Remember: You are arguing heaily {self.side} of this topic: {self.topic}
              - Focus only on addressing your opponent's points and advancing your case.
@@ -86,7 +86,8 @@ class DebateAgent:
              - Write a detailed response (about 300–400 words).
 
             Core Directives:
-            - The following directives should only apply to your opponent's response, which is {opponent_argument}
+            - The following directives should only apply to your opponent's response, which is the following: OPPONENT ARGUMENT: {opponent_argument}. 
+            - You job is to only expose flaws with the OPPONENT ARGUMENT
             - Expose Logical Flaws First: Identify fallacies (straw man,* false dichotomy*,* circular reasoning*) immediately.*
                 Highlight contradictions between stated principles vs real-world implications.*
                 Demand empirical evidence for every claim—dismiss unsupported assertions outright.
