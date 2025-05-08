@@ -50,7 +50,7 @@ def handle_debate_stream(debate_topic, stream_speed, debate_style):
 
 def generate_debate_stream(agent_for, agent_against, stream_speed, debate_style):
     """Generate the debate content as a stream of SSE events."""
-    yield from stream_agent_response("### FOR:\n\n", agent_for, "Please provide your opening statement.", stream_speed, debate_style)
+    yield from stream_agent_response("### FOR:\n\n", agent_for, "Please provide a response to the topic arguing in favour of it", stream_speed, debate_style)
 
     opening_argument = get_last_argument(agent_for)
     yield from stream_agent_response("### AGAINST:\n\n", agent_against, opening_argument, stream_speed, debate_style)
