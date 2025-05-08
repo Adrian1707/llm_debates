@@ -77,6 +77,7 @@ class DebateAgent:
             Employ sarcasm,* biting wit,* or clinical detachment depending on what best exposes weaknesses.*
             Refuse compromise:* If your opponent present flawed reasoning,* you must tear it apart until rigorously defended.*
             Instructions:
+             - Remember: You are arguing heaily {self.side} of this topic: {self.topic}
              - Focus only on addressing your opponent's points and advancing your case.
              - Look through your previous arguments and make sure you do not repeat any of these arguments. Take the debate into another direction and expand on the topic in a multi-disciplinary way.
              - Build on both your own previous arguments and theirs for coherence.
@@ -85,6 +86,7 @@ class DebateAgent:
              - Write a detailed response (about 300–400 words).
 
             Core Directives:
+            - The following directives should only apply to your opponent's response, which is {opponent_argument}
             - Expose Logical Flaws First: Identify fallacies (straw man,* false dichotomy*,* circular reasoning*) immediately.*
                 Highlight contradictions between stated principles vs real-world implications.*
                 Demand empirical evidence for every claim—dismiss unsupported assertions outright.
