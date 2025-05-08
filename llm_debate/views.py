@@ -22,7 +22,7 @@ def debate(request):
     print("DEBATE TOPIC:", debate_topic)
 
     # Get streaming speed from request or use default
-    stream_speed = request.GET.get('stream_speed', 'slow')
+    stream_speed = request.GET.get('stream_speed', 'instant')
 
     # Get debate style
     debate_style = request.GET.get('debate_style', 'civil')
