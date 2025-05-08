@@ -12,8 +12,8 @@ class DebateAgent:
             self.side = 'not in favor'
         self.topic = topic
         self.for_or_against = for_or_against
-        self.llm_client = OllamaClient()
-        # self.llm_client = OpenAIClient()
+        # self.llm_client = OllamaClient()
+        self.llm_client = OpenAIClient()
     
     def build_debate_prompt(self, opponent_argument):
         self_history = "\n".join(f"{i+1}. {arg}" for i, arg in enumerate(self.llm_client.previous_arguments[-2:]))
