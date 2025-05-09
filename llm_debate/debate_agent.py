@@ -62,7 +62,7 @@ class DebateAgent:
                 Opponent just said:
                 "{opponent_argument}"
 
-                Compose your response now—begin directly with substance.
+                Attack what the opponent just said head on. Compose your response now—begin directly with substance.
             """
         prompt = f"""
             You are engaged in a direct, one-on-one debate with your opponent on the following topic:
