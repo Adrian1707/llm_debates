@@ -57,7 +57,7 @@ def generate_debate_stream(agent_for, agent_against, stream_speed, debate_style)
     
     # Subsequent rounds
     current_turn = 'for'
-    max_rounds = 6
+    max_rounds = 5
     
     for _ in range(1, max_rounds):
         if current_turn == 'for':
@@ -122,9 +122,8 @@ def get_stream_delay(stream_speed):
 
 def get_last_argument(agent):
     """Safely get the last argument from an agent."""
-    return agent.llm_client.previous_arguments
     if hasattr(agent, 'previous_arguments') and agent.previous_arguments:
-        return agent.previous_arguments[-1]
+        return agent.previous_arguments()[-1]
     return ""
 
 def should_add_new_line(s: str) -> bool:
