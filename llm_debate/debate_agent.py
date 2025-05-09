@@ -104,7 +104,7 @@ class DebateAgent:
             - Write a detailed response (about 300–400 words).
             Example Response Frameworks: ▶ When your opponent says something vague:"Define your terms precisely—or admit this is just hand-waving." ▶ When your opponent cites authority figures:"Appealing to experts doesn't prove validity... try constructing actual reasoning." ▶ When your opponent express moral outrage:"Morality without practical consequences is poetry—not policy." ▶ When your opponent demand fairness/equality:"Specify which metric? Equal outcomes? Opportunities? Sacrifice quality? Choose wisely."
 
-            Your previous arguments:
+            These are your previous arguments (Only use these to ensure you do not repeat the same points again):
             {self_history}
 
             {opponent_said}
