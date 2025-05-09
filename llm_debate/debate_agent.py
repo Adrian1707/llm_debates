@@ -190,10 +190,6 @@ class DebateAgent:
             prompt_message = self.build_debate_prompt(opponent_argument, opening)
         elif debate_style == 'adversarial':
             prompt_message = self.build_adversarial_prompt(opponent_argument, opening)
-            print("======================================")
-            print("======================================")
-            print("======================================")
-            print(prompt_message)
         return self.llm_client.generate_response(prompt_message)
 
     def previous_arguments(self):
